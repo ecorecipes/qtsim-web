@@ -1,0 +1,30 @@
+[package]
+name = "qtsim"
+version = "0.1.0"
+edition = "2024"
+license = "GPL-3.0-or-later"
+description = "QTSim (Pagel, Gardner and Meade 2025) ported to Rust, for the command line and WebAssembly"
+publish = false
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[[bin]]
+name = "qtsim"
+path = "src/bin/qtsim.rs"
+
+[features]
+# Use the platform's libm for exp, log and tan instead of the portable one (the
+# `libm` crate, a port of musl). Native builds with this feature reproduce the C
+# QTSim's calls to Apple's or glibc's libm; the default makes native and
+# WebAssembly builds give the same bits. See README.md, "Exactness".
+system-libm = []
+
+[dependencies]
+libm = "0.2"
+
+[profile.release]
+opt-level = 3
+lto = true
+codegen-units = 1
+panic = "abort"

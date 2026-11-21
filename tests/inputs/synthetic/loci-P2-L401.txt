@@ -1,0 +1,13 @@
+Sample 1
+PopSize 200
+Generations 400
+PhenotypeVar 0.02
+Heritability 0.5
+MutationScalar 0.001
+Seed 4711
+Ploidy 2
+NoQTL 401
+PopSize 60
+Generations 200
+RecombinationPoissonMean 3
+MutationRatePerGamete 0.01

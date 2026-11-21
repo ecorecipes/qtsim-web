@@ -1,0 +1,5 @@
+PopSize 20
+Generations 5
+Seed 3
+OptimumMoveType sideways
+MoveFitnessSD 2 0.1

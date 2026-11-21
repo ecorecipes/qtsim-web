@@ -1,0 +1,5 @@
+PopSize 20
+Generations 5
+Seed 3
+PopSize 0
+Generations 0

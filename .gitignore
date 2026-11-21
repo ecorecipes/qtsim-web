@@ -1,0 +1,5 @@
+/target/
+/target-syslibm/
+/dist/
+/web/qtsim.wasm
+.DS_Store

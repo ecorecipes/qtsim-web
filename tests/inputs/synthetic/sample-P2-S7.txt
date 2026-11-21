@@ -1,0 +1,13 @@
+Sample 1
+PopSize 200
+Generations 400
+PhenotypeVar 0.02
+Heritability 0.5
+MutationScalar 0.001
+Seed 4711
+Ploidy 2
+Sample 7
+NoQTL 4
+Generations 2500
+PopSize 50
+MoveFitnessSD 2000 0.5

@@ -1,0 +1,4 @@
+PopSize 20
+Generations 5
+Seed 3
+MutationRatePerGamete -1

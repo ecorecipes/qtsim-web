@@ -1,0 +1,7 @@
+PopSize 20
+Generations 5
+Seed 3
+PopSize 0
+Ploidy 2
+StandardisePhenotype
+MoveFitnessSD 0 0.5

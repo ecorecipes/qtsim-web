@@ -1,0 +1,14 @@
+# a comment
+
+sample	2
+POPSIZE 90
+noqtl   11
+  ploidy 2
+GENERATIONS 120
+phenotypevar 0.03
+Heritability 0.4
+MutationScalar 0.002
+seed 77
+movefitnesssd 60 0.4
+optimummovetype PHENOTYPE
+#Seed 78

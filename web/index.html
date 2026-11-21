@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>QTSim Explorer</title>
+<meta name="description" content="Explore QTSim, the quantitative-genetic simulation of adaptation to a moving optimum (Pagel, Gardner and Meade 2025), in the browser.">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="bar">
+  <div class="brand">
+    <span class="name">QTSim Explorer</span>
+    <span class="sub">adaptation to a moving optimum</span>
+  </div>
+  <div class="controls">
+    <button id="run" class="primary" title="Run (space)">Run</button>
+    <button id="step" title="One generation (→)">Step</button>
+    <button id="reset" title="Start again with these settings (R)">Reset</button>
+    <span class="status" id="status">Loading…</span>
+  </div>
+  <div class="exports">
+    <details class="menu">
+      <summary>Export</summary>
+      <div class="menu-items">
+        <button id="dl-csv">Records (CSV)</button>
+        <button id="dl-out">QTSim output (text)</button>
+        <button id="dl-opt">Options file</button>
+      </div>
+    </details>
+    <button id="theme" class="icon" title="Light or dark" aria-label="Toggle light or dark">◐</button>
+  </div>
+</header>
+
+<div class="layout">
+  <aside class="panel" id="panel">
+    <label class="row preset">
+      <span>Start from</span>
+      <select id="preset"></select>
+    </label>
+
+    <fieldset>
+      <legend>Population</legend>
+      <label class="row"><span>Individuals <i>N</i></span><input id="PopSize" type="number" min="2" step="1"></label>
+      <label class="row"><span>Ploidy</span><select id="Ploidy"><option value="2">diploid</option><option value="1">haploid</option></select></label>
+      <label class="row"><span>Generations</span><input id="Generations" type="number" min="1" step="1"></label>
+      <label class="row"><span>Record every</span><input id="Sample" type="number" min="1" step="1"></label>
+      <label class="row"><span>Seed</span><span class="pair"><input id="Seed" type="number" min="0" step="1"><button id="reseed" class="icon" title="New seed" aria-label="New seed">⟳</button></span></label>
+    </fieldset>
+
+    <fieldset>
+      <legend>Genetics</legend>
+      <label class="row"><span>Loci <i>L</i></span><input id="NoQTL" type="number" min="1" step="1"></label>
+      <label class="row"><span>Mutations per gamete per locus</span><input id="MutationRatePerGamete" type="number" min="0" step="any"></label>
+      <label class="row"><span>Mutation scalar <i>m</i></span><input id="MutationScalar" type="number" min="0" step="any"></label>
+      <label class="row"><span>Crossover points (Poisson mean)</span><input id="RecombinationPoissonMean" type="number" min="0" step="any"></label>
+    </fieldset>
+
+    <fieldset>
+      <legend>Phenotype and selection</legend>
+      <label class="row"><span>Phenotypic variance <i>V</i><sub>P</sub></span><input id="PhenotypeVar" type="number" min="0" step="any"></label>
+      <label class="row"><span>Heritability <i>h</i>²</span><input id="Heritability" type="number" min="0" max="1" step="any"></label>
+      <label class="row"><span>Width of selection <i>ω</i></span>
+        <select id="omegaMode"><option value="analytic">analytical</option><option value="fixed">fixed</option></select></label>
+      <label class="row" id="omegaRow"><span>ω</span><input id="InitFitnessSD" type="number" min="0" step="any"></label>
+      <p class="hint" id="omegaHint"></p>
+      <label class="check"><input id="StandardisePhenotype" type="checkbox"> Standardise phenotypes</label>
+    </fieldset>
+
+    <fieldset>
+      <legend>Environmental change</legend>
+      <label class="row"><span>Optimum</span>
+        <select id="OptimumMoveType">
+          <option value="none">stays put</option>
+          <option value="continuous">moves steadily</option>
+          <option value="phenotype">jumps (phenotypic SDs)</option>
+          <option value="fitness">jumps (widths ω)</option>
+        </select></label>
+      <label class="row move"><span>From generation</span><input id="MoveGen" type="number" min="0" step="1"></label>
+      <label class="row move"><span id="moveLabel">Per generation</span><input id="MoveSD" type="number" step="any"></label>
+      <label class="check"><input id="changeOn" type="checkbox"> Change ω at a generation</label>
+      <label class="row change"><span>At generation</span><input id="ChangeGen" type="number" min="0" step="1"></label>
+      <label class="row change"><span>New ω</span><input id="ChangeSD" type="number" min="0" step="any"></label>
+    </fieldset>
+
+    <fieldset>
+      <legend>Engine</legend>
+      <div class="seg" id="mode" role="radiogroup" aria-label="Engine">
+        <label><input type="radio" name="mode" value="0" checked><span>Exact</span></label>
+        <label><input type="radio" name="mode" value="1"><span>Fast 1</span></label>
+        <label><input type="radio" name="mode" value="2"><span>Fast 2</span></label>
+      </div>
+      <p class="hint" id="modeHint"></p>
+    </fieldset>
+
+    <details class="file">
+      <summary>Options file</summary>
+      <textarea id="optText" spellcheck="false" rows="14"></textarea>
+      <div class="file-actions">
+        <button id="useText">Run this file</button>
+        <label class="button">Open…<input id="openFile" type="file" accept=".txt,text/plain" hidden></label>
+      </div>
+      <p class="hint">The settings above write this file, in QTSim's format. You can edit it, or open one of yours, and run it as it stands.</p>
+    </details>
+  </aside>
+
+  <main class="main">
+    <section class="cards" aria-live="polite">
+      <div class="card"><span class="k">Generation</span><span class="v" id="c-gen">–</span></div>
+      <div class="card"><span class="k">Mean phenotype <i>z̄</i></span><span class="v" id="c-z">–</span></div>
+      <div class="card"><span class="k">Optimum <i>θ</i></span><span class="v" id="c-theta">–</span></div>
+      <div class="card"><span class="k">Lag (θ − z̄)/√<i>V</i><sub>P</sub></span><span class="v" id="c-lag">–</span></div>
+      <div class="card"><span class="k">Genetic variance <i>V</i><sub>G</sub></span><span class="v" id="c-vg">–</span></div>
+      <div class="card"><span class="k">Survivors</span><span class="v" id="c-surv">–</span></div>
+    </section>
+
+    <section class="charts">
+      <figure class="chart"><figcaption><span>Mean phenotype and optimum</span></figcaption><canvas id="ch-z"></canvas></figure>
+      <figure class="chart"><figcaption><span>Genetic variance <i>V</i><sub>G</sub></span></figcaption><canvas id="ch-vg"></canvas></figure>
+      <figure class="chart"><figcaption><span>Lag behind the optimum, θ − z̄</span></figcaption><canvas id="ch-lag"></canvas></figure>
+      <figure class="chart"><figcaption><span>Share surviving selection</span></figcaption><canvas id="ch-surv"></canvas></figure>
+      <figure class="chart wide"><figcaption><span>This generation: phenotypes and the fitness function</span></figcaption><canvas id="ch-pop"></canvas></figure>
+    </section>
+
+    <p class="error" id="error" hidden></p>
+  </main>
+</div>
+
+<footer class="foot">
+  <span>QTSim by Andrew Meade (QTLSim 1.0, © 2023); model of Pagel, Gardner and Meade, <i>Scientific Reports</i> 2025 (doi:10.1038/s41598-025-24445-2). This port: Rust and WebAssembly, GPL-3.0-or-later.</span>
+  <span id="speed"></span>
+</footer>
+
+<script src="app.js"></script>
+</body>
+</html>
