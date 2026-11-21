@@ -7,6 +7,7 @@
 #   make test         unit tests, and the examples against their recorded outputs
 #   make parity DIRS="dir ..."        against the C programs (QTSIM=, QTSIMFAST=)
 #   make parity-wasm DIRS="dir ..."   the WebAssembly module against the native build
+#   make pages        publish dist/qtsim.html to the gh-pages branch (GitHub Pages)
 #
 # Needs Rust with the wasm32-unknown-unknown target (rustup target add
 # wasm32-unknown-unknown) and, for the app's bundle and the WebAssembly checks, Node.
@@ -15,7 +16,7 @@ CARGO ?= cargo
 WASM = target/wasm32-unknown-unknown/release/qtsim.wasm
 DIRS ?= tests/inputs
 
-.PHONY: build wasm web serve test parity parity-wasm clean
+.PHONY: build wasm web serve test parity parity-wasm pages clean
 
 build:
 	$(CARGO) build --release
@@ -39,6 +40,9 @@ parity: build
 
 parity-wasm: build wasm
 	tools/parity_wasm.sh $(DIRS)
+
+pages:
+	tools/publish_pages.sh
 
 clean:
 	$(CARGO) clean

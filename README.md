@@ -1,5 +1,8 @@
 # QTSim in Rust and WebAssembly, with a browser explorer
 
+**Try it:** <https://ecorecipes.github.io/qtsim-web/> (the explorer, one self-contained
+page; it runs in your browser and sends nothing anywhere).
+
 **This is a modified version of QTSim** (its source calls itself QTLSim 1.0), the
 quantitative-genetic simulation of Pagel, Gardner and Meade, *Quantitative genetic
 analysis of directional adaptation suggests low maximum sustainable rates of change in
@@ -37,6 +40,7 @@ target/release/qtsim tests/inputs/examples/design_0100_loci.txt > out.tsv
 make web                     # web/qtsim.wasm and dist/qtsim.html
 open dist/qtsim.html         # or: make serve, then http://localhost:8000
 make test                    # unit tests; native and WebAssembly outputs against tests/expected.tsv
+make pages                   # rebuild dist/qtsim.html and publish it to the gh-pages branch
 ```
 
 ## The explorer
