@@ -11,7 +11,6 @@ set -eu
 HERE=$(cd "$(dirname "$0")/.." && pwd)
 cd "$HERE"
 REMOTE=${1:-origin}
-URL=$(git remote get-url "$REMOTE")
 SRC=$(git rev-parse --short HEAD)
 git diff --quiet HEAD || echo "note: the working tree has uncommitted changes; the page is built from them"
 
@@ -27,5 +26,7 @@ git -C "$T" config user.name "$(git config user.name)"
 git -C "$T" config user.email "$(git config user.email)"
 git -C "$T" add -A
 git -C "$T" commit -q -m "QTSim Explorer, built from $SRC"
-git -C "$T" push -q -f "$URL" gh-pages
+# pushed from this repository, with its remote's credentials (no local gh-pages branch)
+git fetch -q "$T" gh-pages
+git push -q -f "$REMOTE" FETCH_HEAD:refs/heads/gh-pages
 echo "published dist/qtsim.html (from $SRC) to $REMOTE gh-pages"
