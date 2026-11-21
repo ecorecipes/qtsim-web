@@ -43,6 +43,11 @@ make test                    # unit tests; native and WebAssembly outputs agains
 make pages                   # rebuild dist/qtsim.html and publish it to the gh-pages branch
 ```
 
+Every push to `main` does the same on GitHub (`.github/workflows/pages.yml`): it runs
+`make test` (on Linux x86-64, so the recorded outputs also check that results do not
+depend on the platform), builds `dist/qtsim.html` and replaces the `gh-pages` branch, which
+GitHub Pages serves. Nothing is published if a test fails. `make pages` is the same by hand.
+
 ## The explorer
 
 Settings on the left (population, genetics, phenotype and selection, environmental change,
